@@ -33,6 +33,10 @@ python -u analisis_arg_sub20.py
 python -u analisis_detallado.py
 ```
 
+## Dependencia
+
+Se usa la librería [ScraperFC](https://github.com/oseymour/ScraperFC) (paquete Python para scraping de datos de fútbol); este proyecto se desarrolló sobre un **fork propio**: [mgaleano2/ScraperFC](https://github.com/mgaleano2/ScraperFC).
+
 Salidas en `data/`:
 
 - `top20_{defensores,mediocampistas,delanteros}.csv`
