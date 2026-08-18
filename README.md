@@ -10,6 +10,7 @@ El proyecto tiene dos partes: un **scraper** que genera los datos y una **app** 
 |---|---|
 | `liga_arg.py` | Scraper: baja stats de Sofascore, las procesa con pandas y escribe `data/top_jugadores_liga.csv`. |
 | `streamlit_arg.py` | App: filtros, tabla, gráficos, radar chart y ficha por jugador leyendo el CSV generado. |
+Link: https://ligaargentina2026.streamlit.app/
 
 ### `liga_arg.py`
 
