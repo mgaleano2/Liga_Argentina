@@ -24,6 +24,13 @@ RENOMBRES = {
     "wasFouled": "Faltas recibidas", "fouls": "Faltas",
     "yellowCards": "Amarillas", "redCards": "Rojas", "ownGoals": "Autogoles",
     "Edad": "Edad",
+    "pct_conversion": "% conversión", "pct_duelos": "% duelos ganados",
+    "xG_diff": "Goles - xG", "xA_diff": "Asist. - xA",
+    "xG_diff_per90": "Goles-xG /90", "xA_diff_per90": "Asist-xA /90",
+    "min_por_partido": "Min / partido",
+    "defensiveActions_per90": "Acc. def. /90",
+    "pct_tiros_arco": "% gol",
+    "xG_per_shot": "xG / tiro",
 }
 
 PER90 = ["goals", "assists", "goalsAssistsSum", "expectedGoals", "expectedAssists",
@@ -35,45 +42,55 @@ for c in PER90:
 
 COLUMNAS_GRUPOS = {
     "Básicas": ["player", "team", "posicion", "Edad", "rating", "minutesPlayed", "appearances"],
-    "Ataque": ["goals", "assists", "goalsAssistsSum", "expectedGoals", "expectedAssists", "penaltyGoals"],
+    "Ataque": ["goals", "assists", "goalsAssistsSum", "expectedGoals", "expectedAssists", "penaltyGoals", "xG_per_shot"],
     "Tiros": ["totalShots", "shotsOnTarget", "shotsOffTarget"],
     "Creación": ["bigChancesCreated", "keyPasses", "successfulDribbles"],
     "Pases": ["totalPasses", "accuratePassesPercentage"],
-    "Defensa": ["tackles", "interceptions", "ballRecovery", "clearances", "blockedShots", "totalDuelsWon", "duelLost"],
+    "Defensa": ["tackles", "interceptions", "ballRecovery", "clearances", "blockedShots",
+                "totalDuelsWon", "duelLost", "pct_duelos"],
     "Disciplina": ["yellowCards", "redCards", "fouls", "wasFouled", "ownGoals"],
+    "Derivadas": ["pct_conversion", "pct_duelos", "pct_tiros_arco", "xG_per_shot",
+                  "xG_diff", "xA_diff", "xG_diff_per90", "xA_diff_per90",
+                  "min_por_partido", "defensiveActions_per90"],
     "Por 90": [f"{c}_per90" for c in PER90],
 }
 
-ORDENES = ["rating", "goals", "goals_per90", "expectedGoals", "expectedGoals_per90",
-           "assists", "keyPasses", "minutesPlayed", "appearances", "totalShots",
-           "successfulDribbles", "tackles", "ballRecovery", "Edad"]
+ORDENES = [
+    "rating", "goals", "goals_per90", "pct_tiros_arco", "xG_per_shot",
+    "assists", "keyPasses", "successfulDribbles", "accuratePassesPercentage",
+    "pct_duelos", "xG_diff_per90", "minutesPlayed", "appearances",
+    "fouls", "wasFouled", "yellowCards",
+    "expectedGoals", "ballRecovery",
+]
 
-# Atributos del radar (percentil dentro de la liga, 0-100)
 RADAR_STATS = {
-    "Ataque": "goals_per90",
     "Creación": "keyPasses_per90",
     "Regate": "successfulDribbles_per90",
-    "Duelos": "totalDuelsWon_per90",
+    "% duelos": "pct_duelos",
     "Defensa": "tackles_per90",
-    "Pases": "accuratePassesPercentage",
+    "% pases": "accuratePassesPercentage",
+    "xG / tiro": "xG_per_shot",
 }
 
-# Set más amplio de percentiles, usado para detectar fortalezas / a mejorar
 PERFIL_STATS = {
     "Goles /90": "goals_per90",
     "xG /90": "expectedGoals_per90",
+    "Goles - xG": "xG_diff",
+    "Goles-xG /90": "xG_diff_per90",
     "Asistencias /90": "assists_per90",
+    "Asist. - xA": "xA_diff",
+    "Asist-xA /90": "xA_diff_per90",
     "Pases clave /90": "keyPasses_per90",
-    "Regates ok /90": "successfulDribbles_per90",
     "% pases": "accuratePassesPercentage",
-    "Entradas /90": "tackles_per90",
-    "Intercepciones /90": "interceptions_per90",
-    "Recuperaciones /90": "ballRecovery_per90",
-    "Duelos ganados /90": "totalDuelsWon_per90",
+    "Regates ok /90": "successfulDribbles_per90",
+    "Acc. def. /90": "defensiveActions_per90",
+    "% duelos ganados": "pct_duelos",
+    "Faltas /90": "fouls_per90",
+    "Faltas recibidas /90": "wasFouled_per90",
 }
 
 # ============================================================
-# ESTILOS — reporte de scouting profesional (no "carta de FIFA")
+# ESTILOS
 # ============================================================
 st.markdown("""
 <style>
@@ -82,7 +99,6 @@ st.markdown("""
 [data-testid="stMetricValue"] { font-weight: 700; }
 [data-testid="stMetricLabel"] { opacity: 0.75; }
 
-/* ---- encabezado de ficha ---- */
 .player-header {
     background: #171b23;
     border-left: 6px solid var(--accent, #4fa8f0);
@@ -94,7 +110,27 @@ st.markdown("""
     gap: 16px;
     margin-bottom: 4px;
 }
+.player-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.player-photo {
+    width: 100px; height: 100px; border-radius: 50%;
+    object-fit: cover; border: 3px solid var(--accent, #4fa8f0);
+    background: #11141a;
+    flex-shrink: 0;
+}
+.player-id .player-name-row {
+    display: flex; align-items: center; gap: 10px;
+}
 .player-id .player-name { font-size: 25px; font-weight: 800; letter-spacing: -0.3px; color: #f3f5f8; }
+.team-badge {
+    width: 28px; height: 28px; border-radius: 6px;
+    object-fit: contain;
+    background: #1e222d; padding: 3px;
+    border: 1px solid #2a2f3a;
+}
 .player-id .player-meta { font-size: 13.5px; color: #9aa4b5; margin-top: 3px; }
 .player-id .player-meta b { color: #d6dae2; }
 .rating-badge {
@@ -105,7 +141,6 @@ st.markdown("""
     flex-shrink: 0;
 }
 
-/* ---- tablas de stats por sección ---- */
 .stat-block { background: #14171e; border-radius: 10px; padding: 14px 16px 8px 16px; height: 100%; }
 .stat-block-title {
     font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
@@ -116,13 +151,20 @@ st.markdown("""
 .stat-table td.val { text-align: right; font-weight: 700; color: #f0f2f5; white-space: nowrap; }
 .stat-table tr:last-child td { border-bottom: none; }
 
-/* ---- fortalezas / a mejorar ---- */
-.tag-pill {
-    display: inline-block; padding: 4px 11px; border-radius: 20px;
-    font-size: 12.5px; font-weight: 600; margin: 3px 6px 3px 0;
+.pct-bar-row {
+    display: flex; align-items: center; gap: 8px; margin: 4px 0;
 }
-.tag-fuerte { background: rgba(62,207,110,0.15); color: #4fdc84; border: 1px solid rgba(62,207,110,0.4); }
-.tag-debil  { background: rgba(224,82,77,0.15); color: #f0776f; border: 1px solid rgba(224,82,77,0.4); }
+.pct-bar-label {
+    width: 150px; font-size: 13px; color: #c9cfd8; flex-shrink: 0;
+}
+.pct-bar-track {
+    flex: 1; background: #1a1e27; border-radius: 4px; height: 10px; overflow: hidden;
+}
+.pct-bar-fill-green { height: 100%; background: #4fdc84; border-radius: 4px; }
+.pct-bar-fill-red   { height: 100%; background: #f0776f; border-radius: 4px; }
+.pct-bar-value {
+    width: 38px; font-size: 12px; font-weight: 700; text-align: right; color: #f0f2f5;
+}
 
 .section-label {
     font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
@@ -141,6 +183,25 @@ def cargar():
     df["player id"] = df["player id"].astype(str)
     df["team id"] = df["team id"].astype(str)
     df["Edad"] = pd.to_numeric(df["Edad"], errors="coerce").astype("Int64")
+
+    per90_cols = [f"{c}_per90" for c in PER90]
+    for c in per90_cols:
+        if c in df.columns:
+            df.loc[df["minutesPlayed"] < 90, c] = pd.NA
+
+    df["pct_conversion"] = (df["goals"] / df["totalShots"] * 100).where(df["totalShots"] > 0)
+    df["xG_diff"] = df["goals"] - df["expectedGoals"]
+    df["xA_diff"] = df["assists"] - df["expectedAssists"]
+    df["xG_diff_per90"] = df["goals_per90"] - df["expectedGoals_per90"]
+    df["xA_diff_per90"] = df["assists_per90"] - df["expectedAssists_per90"]
+    duelos_tot = df["totalDuelsWon"] + df["duelLost"]
+    df["pct_duelos"] = (df["totalDuelsWon"] / duelos_tot * 100).where(duelos_tot > 0)
+    df["min_por_partido"] = (df["minutesPlayed"] / df["appearances"]).where(df["appearances"] > 0)
+    df["defensiveActions_per90"] = df["tackles_per90"].fillna(0) + df["interceptions_per90"].fillna(0)
+    df["pct_tiros_arco"] = (df["goals"] / df["shotsOnTarget"] * 100).where(df["shotsOnTarget"] >= 5)
+    df["xG_per_shot"] = (df["expectedGoals"] / df["totalShots"]).where(df["totalShots"] >= 5)
+    df["accuratePassesPercentage"] = df["accuratePassesPercentage"].where(df["totalPasses"] >= 20)
+
     return df
 
 
@@ -155,7 +216,6 @@ def ultima_actualizacion() -> str:
 
 @st.cache_data
 def calcular_percentiles(df: pd.DataFrame, stats: dict) -> pd.DataFrame:
-    """Percentil (0-100) de cada jugador dentro de TODA la liga, para un set de columnas dado."""
     pct = pd.DataFrame(index=df.index)
     for label, col in stats.items():
         pct[label] = (df[col].rank(pct=True) * 100).round(0)
@@ -189,16 +249,24 @@ def stat_row(label, value):
 
 
 def stat_cnt(row, col, dec=0):
-    """Formatea un valor; si la columna no tiene datos en TODA la liga, avisa en vez de mostrar 'nan'."""
     if col not in row or pd.isna(row[col]):
         return "N/D" if columnas_sin_datos.get(col) else "—"
     return f"{row[col]:.{dec}f}"
 
 
+def pct_bar_html(label, value, is_positive=True):
+    color_class = "pct-bar-fill-green" if is_positive else "pct-bar-fill-red"
+    return (
+        f'<div class="pct-bar-row">'
+        f'<span class="pct-bar-label">{label}</span>'
+        f'<div class="pct-bar-track"><div class="{color_class}" style="width:{value:.0f}%;"></div></div>'
+        f'<span class="pct-bar-value">P{int(value)}</span>'
+        f'</div>'
+    )
+
+
 df = cargar()
 
-# Columnas que Sofascore no trackea para esta liga (100% NaN) — se detecta
-# dinámicamente para no ocultar el dato el día que la fuente lo empiece a dar.
 columnas_sin_datos = {c: df[c].isna().all() for c in df.columns if df[c].dtype != "object"}
 
 RADAR_STATS = {k: v for k, v in RADAR_STATS.items() if not columnas_sin_datos.get(v)}
@@ -208,7 +276,7 @@ percentiles_radar = calcular_percentiles(df, RADAR_STATS)
 percentiles_perfil = calcular_percentiles(df, PERFIL_STATS)
 
 # ============================================================
-# SIDEBAR — FILTROS primero, FICHA vinculada a esos filtros
+# SIDEBAR
 # ============================================================
 with st.sidebar:
     st.markdown("## ⚽ Liga Profesional")
@@ -232,15 +300,20 @@ with st.sidebar:
     )
     filtrado = df[filtro].copy()
 
+    METRICAS_SIN_PORTEROS = {"pct_duelos", "ballRecovery", "defensiveActions_per90"}
+
     with st.expander("⚙️ Tabla y orden", expanded=False):
-        orden_col = st.selectbox("Ordenar por", ORDENES, format_func=lambda c: RENOMBRES[c])
+        orden_col = st.selectbox("Ordenar por", ORDENES, format_func=lambda c: RENOMBRES.get(c, c))
         ascendente = st.checkbox("Ascendente", value=False)
         grupos_sel = st.multiselect("Columnas a mostrar", list(COLUMNAS_GRUPOS),
-                                    default=["Básicas", "Ataque", "Tiros", "Creación", "Por 90"])
+                                    default=["Básicas", "Ataque", "Tiros", "Creación", "Derivadas"])
 
-    # Se ordena ACÁ (antes de armar la lista de la ficha) para que el
-    # selector de jugador respete el mismo orden que la tabla / el filtro.
-    filtrado = filtrado.sort_values(orden_col, ascending=ascendente, na_position="last")
+    orden_para_sort = orden_col
+    if orden_col in METRICAS_SIN_PORTEROS:
+        orden_para_sort = f"_orden_{orden_col}"
+        filtrado[orden_para_sort] = filtrado[orden_col].where(filtrado["posicion"] != "Portero")
+
+    filtrado = filtrado.sort_values(orden_para_sort, ascending=ascendente, na_position="last")
 
     st.divider()
     st.markdown("### 🃏 Ficha de jugador")
@@ -248,10 +321,11 @@ with st.sidebar:
         st.info("Ningún jugador cumple los filtros.")
         jugador = None
     else:
+        ficha_key = f"ficha_{orden_col}_{ascendente}"
         jugador = st.selectbox(
             "Elegir jugador (según filtros y orden de la tabla)",
-            pd.unique(filtrado["player"]),  # respeta el orden de filtrado, no alfabético
-            key="ficha_jugador",
+            pd.unique(filtrado["player"]),
+            key=ficha_key,
         )
         st.caption(f"{len(filtrado)} jugadores disponibles con los filtros actuales.")
 
@@ -270,91 +344,148 @@ st.caption(
 )
 
 # ============================================================
-# FICHA DE JUGADOR — reporte de scouting
+# FICHA DE JUGADOR
 # ============================================================
 p = df[df["player"] == jugador].iloc[0]
 accent = tier_color(p["rating"])
 edad_txt = f"{p['Edad']:.0f} años" if pd.notna(p["Edad"]) else "Edad ND"
+es_portero = p["posicion"] == "Portero"
 
-# --- valores consolidados ---
 tiros_tot, tiros_arco = p["totalShots"], p["shotsOnTarget"]
 pct_tiros_arco = (tiros_arco / tiros_tot * 100) if tiros_tot else 0
 duelos_tot = p["totalDuelsWon"] + p["duelLost"]
-pct_duelos = (p["totalDuelsWon"] / duelos_tot * 100) if duelos_tot else 0
+pct_duelos_val = (p["totalDuelsWon"] / duelos_tot * 100) if duelos_tot else 0
+sobr_xg = p["xG_diff"]
+xg_shot = p["xG_per_shot"]
+
+photo_url = f"https://img.sofascore.com/api/v1/player/{p['player id']}/image"
+badge_url = f"https://img.sofascore.com/api/v1/team/{p['team id']}/image"
 
 st.markdown(f"""
 <div class="player-header" style="--accent:{accent};">
-    <div class="player-id">
-        <div class="player-name">{p['player']}</div>
-        <div class="player-meta">
-            {p['team']} · <b>{p['posicion']}</b> · {edad_txt} ·
-            {p['appearances']:.0f} partidos · {p['minutesPlayed']:.0f}' jugados
+    <div class="player-header-left">
+        <img class="player-photo" src="{photo_url}" alt="{p['player']}"
+             onerror="this.style.display='none'">
+        <div class="player-id">
+            <div class="player-name-row">
+                <span class="player-name">{p['player']}</span>
+                <img class="team-badge" src="{badge_url}" alt="{p['team']}"
+                     onerror="this.style.display='none'">
+            </div>
+            <div class="player-meta">
+                {p['team']} · <b>{p['posicion']}</b> · {edad_txt} ·
+                {p['appearances']:.0f} partidos · {p['minutesPlayed']:.0f}' jugados
+                · {p['min_por_partido']:.0f}'/partido
+            </div>
         </div>
     </div>
     <div class="rating-badge" style="--accent:{accent};">{p['rating']:.2f}</div>
 </div>
 """, unsafe_allow_html=True)
 
-col_ofensiva, col_creacion, col_defensa, col_disciplina = st.columns(4)
+# ============================================================
+# FICHA — 4 BLOQUES DE STATS
+# ============================================================
+col1, col2, col3, col4 = st.columns([1.1, 1.1, 0.95, 0.95])
 
-with col_ofensiva:
+if not es_portero:
+    with col1:
+        sobr_txt = f"+{sobr_xg:.1f}" if pd.notna(sobr_xg) and sobr_xg >= 0 else (f"{sobr_xg:.1f}" if pd.notna(sobr_xg) else "—")
+        xg_shot_txt = f"{xg_shot:.2f}" if pd.notna(xg_shot) else "—"
+        def_txt = f"{p['goals']:.0f}/{tiros_arco:.0f} ({p['pct_tiros_arco']:.0f}%)" if pd.notna(p["pct_tiros_arco"]) else "—"
+        st.markdown(f"""
+        <div class="stat-block">
+          <div class="stat-block-title">Ofensiva</div>
+          <table class="stat-table">
+            {stat_row("Goles", f"{p['goals']:.0f}")}
+            {stat_row("Asistencias", f"{p['assists']:.0f}")}
+            {stat_row("G+A", f"{p['goalsAssistsSum']:.0f}")}
+            {stat_row("Goles - xG", sobr_txt)}
+            {stat_row("% gol", def_txt)}
+            {stat_row("Tiros", f"{tiros_tot:.0f}")}
+            {stat_row("Tiros al arco", f"{tiros_arco:.0f} ({pct_tiros_arco:.0f}%)")}
+            {stat_row("Tiros fuera", f"{p['shotsOffTarget']:.0f}")}
+            {stat_row("De penal", f"{p['penaltyGoals']:.0f}")}
+            {stat_row("xG / tiro", xg_shot_txt)}
+          </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        kp90 = stat_cnt(p, "keyPasses_per90", 2)
+        dr90 = stat_cnt(p, "successfulDribbles_per90", 2)
+        st.markdown(f"""
+        <div class="stat-block">
+          <div class="stat-block-title">Creación</div>
+          <table class="stat-table">
+            {stat_row("Pases clave", f"{p['keyPasses']:.0f} · {kp90} /90")}
+            {stat_row("Ocasiones creadas", stat_cnt(p, "bigChancesCreated"))}
+            {stat_row("Regates ok", f"{p['successfulDribbles']:.0f} · {dr90} /90")}
+            {stat_row("Pases (precisión)", f"{p['totalPasses']:.0f} ({p['accuratePassesPercentage']:.0f}%)")}
+          </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+else:
+    with col1:
+        st.markdown(f"""
+        <div class="stat-block">
+          <div class="stat-block-title">Portería</div>
+          <table class="stat-table">
+            {stat_row("Partidos", f"{p['appearances']:.0f}")}
+            {stat_row("Minutos", f"{p['minutesPlayed']:.0f}")}
+            {stat_row("Balones recuperados", f"{p['ballRecovery']:.0f}")}
+            {stat_row("Despejes", f"{p['clearances']:.0f}")}
+            {stat_row("Tiros bloqueados", f"{p['blockedShots']:.0f}")}
+          </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div class="stat-block">
+          <div class="stat-block-title">Distribución</div>
+          <table class="stat-table">
+            {stat_row("Pases (precisión)", f"{p['totalPasses']:.0f} ({p['accuratePassesPercentage']:.0f}%)")}
+            {stat_row("Pases clave", f"{p['keyPasses']:.0f}")}
+            {stat_row("Balones rec. /90", stat_cnt(p, "ballRecovery_per90", 1))}
+          </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+with col3:
+    tk90 = stat_cnt(p, "tackles_per90", 2)
+    ic90 = stat_cnt(p, "interceptions_per90", 2)
+    br90 = stat_cnt(p, "ballRecovery_per90", 1)
     st.markdown(f"""
     <div class="stat-block">
-      <div class="stat-block-title">Ofensiva</div>
+      <div class="stat-block-title">{'Defensa' if not es_portero else 'Disciplina'}</div>
       <table class="stat-table">
-        {stat_row("Goles (xG)", f"{p['goals']:.0f} ({stat_cnt(p, 'expectedGoals', 1)})")}
-        {stat_row("Asistencias (xA)", f"{p['assists']:.0f} ({stat_cnt(p, 'expectedAssists', 1)})")}
-        {stat_row("G+A", f"{p['goalsAssistsSum']:.0f}")}
-        {stat_row("Tiros (al arco)", f"{tiros_tot:.0f} ({tiros_arco:.0f} · {pct_tiros_arco:.0f}%)")}
-        {stat_row("De penal", f"{p['penaltyGoals']:.0f}")}
+        {"" if es_portero else stat_row("Entradas", f"{p['tackles']:.0f} · {tk90} /90")}
+        {"" if es_portero else stat_row("Intercepciones", f"{p['interceptions']:.0f} · {ic90} /90")}
+        {"" if es_portero else stat_row("Recuperaciones", f"{p['ballRecovery']:.0f} · {br90} /90")}
+        {"" if es_portero else stat_row("Despejes", f"{p['clearances']:.0f}")}
+        {stat_row("Duelos ganados", f"{p['totalDuelsWon']:.0f}/{duelos_tot:.0f} ({pct_duelos_val:.0f}%)")}
       </table>
     </div>
     """, unsafe_allow_html=True)
 
-with col_creacion:
+with col4:
     st.markdown(f"""
     <div class="stat-block">
-      <div class="stat-block-title">Creación</div>
+      <div class="stat-block-title">{'Disciplina' if not es_portero else 'Faltas'}</div>
       <table class="stat-table">
-        {stat_row("Pases clave", f"{p['keyPasses']:.0f}")}
-        {stat_row("Ocasiones creadas", stat_cnt(p, "bigChancesCreated"))}
-        {stat_row("Regates ok", f"{p['successfulDribbles']:.0f}")}
-        {stat_row("Pases (precisión)", f"{p['totalPasses']:.0f} ({p['accuratePassesPercentage']:.0f}%)")}
-      </table>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_defensa:
-    st.markdown(f"""
-    <div class="stat-block">
-      <div class="stat-block-title">Defensa</div>
-      <table class="stat-table">
-        {stat_row("Entradas", stat_cnt(p, "tackles"))}
-        {stat_row("Intercepciones", stat_cnt(p, "interceptions"))}
-        {stat_row("Recuperaciones", f"{p['ballRecovery']:.0f}")}
-        {stat_row("Despejes", f"{p['clearances']:.0f}")}
-        {stat_row("Duelos ganados", f"{p['totalDuelsWon']:.0f}/{duelos_tot:.0f} ({pct_duelos:.0f}%)")}
-      </table>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_disciplina:
-    st.markdown(f"""
-    <div class="stat-block">
-      <div class="stat-block-title">Disciplina</div>
-      <table class="stat-table">
-        {stat_row("Amarillas / Rojas", f"{p['yellowCards']:.0f} / {p['redCards']:.0f}")}
         {stat_row("Faltas cometidas", f"{p['fouls']:.0f}")}
         {stat_row("Faltas recibidas", f"{p['wasFouled']:.0f}")}
         {stat_row("Tiros bloqueados", f"{p['blockedShots']:.0f}")}
         {stat_row("Autogoles", f"{p['ownGoals']:.0f}")}
+        {stat_row("Amarillas / Rojas", f"{p['yellowCards']:.0f} / {p['redCards']:.0f}")}
       </table>
     </div>
     """, unsafe_allow_html=True)
 
-_faltantes = [RENOMBRES.get(c, c) for c in
-              ["expectedGoals", "expectedAssists", "tackles", "interceptions", "bigChancesCreated"]
-              if columnas_sin_datos.get(c)]
+_campos = ["expectedGoals", "expectedAssists", "tackles", "interceptions", "bigChancesCreated"]
+_faltantes = [RENOMBRES.get(c, c) for c in _campos if columnas_sin_datos.get(c)]
 if _faltantes:
     st.caption(
         f"⚠️ Sin datos en la fuente para esta liga: {', '.join(_faltantes)} "
@@ -364,28 +495,38 @@ if _faltantes:
 st.write("")
 col_radar, col_perfil = st.columns([1, 1.6])
 
+# ============================================================
+# RADAR
+# ============================================================
 with col_radar:
     st.markdown('<div class="section-label">Perfil de juego (percentil vs. liga)</div>', unsafe_allow_html=True)
-    pj = percentiles_radar.loc[p.name]
-    radar_vals = list(pj.values) + [list(pj.values)[0]]
-    radar_labels = list(pj.index) + [list(pj.index)[0]]
-    fig_radar = go.Figure()
-    fig_radar.add_trace(go.Scatterpolar(
-        r=radar_vals, theta=radar_labels, fill="toself",
-        fillcolor=hex_to_rgba(accent, 0.35), line=dict(color=accent, width=2),
-    ))
-    fig_radar.update_layout(
-        polar=dict(
-            bgcolor="rgba(0,0,0,0)",
-            radialaxis=dict(visible=True, range=[0, 100], showticklabels=False, gridcolor="#2a2f3a"),
-            angularaxis=dict(gridcolor="#2a2f3a"),
-        ),
-        showlegend=False, height=280,
-        margin=dict(l=30, r=30, t=20, b=20),
-        paper_bgcolor="rgba(0,0,0,0)",
-    )
-    st.plotly_chart(fig_radar, width="stretch", config={"displayModeBar": False})
+    pj = percentiles_radar.loc[p.name].dropna()
 
+    if pj.empty:
+        st.caption("No hay datos suficientes para graficar el radar.")
+    else:
+        radar_vals = list(pj.values) + [list(pj.values)[0]]
+        radar_labels = list(pj.index) + [list(pj.index)[0]]
+        fig_radar = go.Figure()
+        fig_radar.add_trace(go.Scatterpolar(
+            r=radar_vals, theta=radar_labels, fill="toself",
+            fillcolor=hex_to_rgba(accent, 0.35), line=dict(color=accent, width=2),
+        ))
+        fig_radar.update_layout(
+            polar=dict(
+                bgcolor="rgba(0,0,0,0)",
+                radialaxis=dict(visible=True, range=[0, 100], showticklabels=False, gridcolor="#2a2f3a"),
+                angularaxis=dict(gridcolor="#2a2f3a"),
+            ),
+            showlegend=False, height=280,
+            margin=dict(l=30, r=30, t=20, b=20),
+            paper_bgcolor="rgba(0,0,0,0)",
+        )
+        st.plotly_chart(fig_radar, width="stretch", config={"displayModeBar": False})
+
+# ============================================================
+# FORTALEZAS / A MEJORAR — barras de percentil
+# ============================================================
 with col_perfil:
     st.markdown('<div class="section-label">Fortalezas y aspectos a mejorar</div>', unsafe_allow_html=True)
     pj_perfil = percentiles_perfil.loc[p.name].dropna().sort_values(ascending=False)
@@ -394,36 +535,35 @@ with col_perfil:
         st.caption("No hay minutos suficientes para calcular percentiles de este jugador.")
     else:
         fuertes = pj_perfil.head(3)
-        debiles = pj_perfil.tail(3)
+        debiles = pj_perfil.tail(3).iloc[::-1]
 
-        pills_fuertes = "".join(
-            f'<span class="tag-pill tag-fuerte">▲ {label} · P{int(val)}</span>'
-            for label, val in fuertes.items()
-        )
-        pills_debiles = "".join(
-            f'<span class="tag-pill tag-debil">▼ {label} · P{int(val)}</span>'
-            for label, val in debiles.items()
-        )
-        st.markdown(pills_fuertes, unsafe_allow_html=True)
-        st.markdown(pills_debiles, unsafe_allow_html=True)
+        html_barras = ""
+        for label, val in fuertes.items():
+            html_barras += pct_bar_html(f"▲ {label}", val, is_positive=True)
+        html_barras += '<div style="height:8px;"></div>'
+        for label, val in debiles.items():
+            html_barras += pct_bar_html(f"▼ {label}", val, is_positive=False)
+
+        st.markdown(html_barras, unsafe_allow_html=True)
         st.caption(
             "Percentil (P) = posición del jugador dentro de toda la liga (300+ min), "
-            "100 = el mejor de la liga en esa métrica, 0 = el último."
+            "100 = el mejor, 0 = el último."
         )
 
 st.divider()
 
 # ============================================================
-# TABLA (siempre visible, debajo de la ficha, sigue los filtros)
+# TABLA
 # ============================================================
 st.markdown('<div class="section-label">📋 Jugadores filtrados</div>', unsafe_allow_html=True)
 
 cols = []
 for g in grupos_sel:
-    cols += [c for c in COLUMNAS_GRUPOS[g] if c in filtrado.columns]
+    cols += [c for c in COLUMNAS_GRUPOS.get(g, []) if c in filtrado.columns]
 cols = list(dict.fromkeys(cols))
 
-vista = filtrado[cols].rename(columns=RENOMBRES)
+vista = filtrado[cols].copy()
+vista = vista.rename(columns={c: RENOMBRES.get(c, c) for c in vista.columns})
 
 config = {}
 for c in vista.columns:
@@ -440,7 +580,7 @@ st.download_button("⬇️ Descargar CSV", data=csv, file_name="top_jugadores_fi
                    mime="text/csv")
 
 # ============================================================
-# GRÁFICOS (en un expander, para no saturar la pantalla)
+# GRÁFICOS
 # ============================================================
 with st.expander("📊 Ver gráficos", expanded=False):
     g1, g2 = st.columns(2)
