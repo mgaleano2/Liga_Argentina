@@ -2,6 +2,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
+import requests
+import base64
 
 st.set_page_config(page_title="Liga Profesional · Scouting", layout="wide",
                     initial_sidebar_state="expanded", page_icon="⚽")
@@ -244,6 +246,17 @@ def hex_to_rgba(hex_color: str, alpha: float) -> str:
     return f"rgba({r},{g},{b},{alpha})"
 
 
+def img_to_base64(url: str) -> str:
+    try:
+        resp = requests.get(url, timeout=8)
+        if resp.status_code == 200 and resp.content:
+            b64 = base64.b64encode(resp.content).decode()
+            return f"data:image/png;base64,{b64}"
+    except Exception:
+        pass
+    return ""
+
+
 def stat_row(label, value):
     return f"<tr><td>{label}</td><td class='val'>{value}</td></tr>"
 
@@ -358,18 +371,18 @@ pct_duelos_val = (p["totalDuelsWon"] / duelos_tot * 100) if duelos_tot else 0
 sobr_xg = p["xG_diff"]
 xg_shot = p["xG_per_shot"]
 
-photo_url = f"https://img.sofascore.com/api/v1/player/{p['player id']}/image"
-badge_url = f"https://img.sofascore.com/api/v1/team/{p['team id']}/image"
+photo_b64 = img_to_base64(f"https://img.sofascore.com/api/v1/player/{p['player id']}/image")
+badge_b64 = img_to_base64(f"https://img.sofascore.com/api/v1/team/{p['team id']}/image")
 
 st.markdown(f"""
 <div class="player-header" style="--accent:{accent};">
     <div class="player-header-left">
-        <img class="player-photo" src="{photo_url}" alt="{p['player']}"
+        <img class="player-photo" src="{photo_b64}" alt="{p['player']}"
              onerror="this.style.display='none'">
         <div class="player-id">
             <div class="player-name-row">
                 <span class="player-name">{p['player']}</span>
-                <img class="team-badge" src="{badge_url}" alt="{p['team']}"
+                <img class="team-badge" src="{badge_b64}" alt="{p['team']}"
                      onerror="this.style.display='none'">
             </div>
             <div class="player-meta">
