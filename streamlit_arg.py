@@ -319,7 +319,7 @@ with st.sidebar:
         orden_col = st.selectbox("Ordenar por", ORDENES, format_func=lambda c: RENOMBRES.get(c, c))
         ascendente = st.checkbox("Ascendente", value=False)
         grupos_sel = st.multiselect("Columnas a mostrar", list(COLUMNAS_GRUPOS),
-                                    default=["Básicas", "Ataque", "Tiros", "Creación", "Derivadas"])
+                                    default=["Básicas", "Ataque", "Tiros", "Creación", "Derivadas", "Por 90"])
 
     orden_para_sort = orden_col
     if orden_col in METRICAS_SIN_PORTEROS:
@@ -365,7 +365,6 @@ edad_txt = f"{p['Edad']:.0f} años" if pd.notna(p["Edad"]) else "Edad ND"
 es_portero = p["posicion"] == "Portero"
 
 tiros_tot, tiros_arco = p["totalShots"], p["shotsOnTarget"]
-pct_tiros_arco = (tiros_arco / tiros_tot * 100) if tiros_tot else 0
 duelos_tot = p["totalDuelsWon"] + p["duelLost"]
 pct_duelos_val = (p["totalDuelsWon"] / duelos_tot * 100) if duelos_tot else 0
 sobr_xg = p["xG_diff"]
@@ -416,7 +415,7 @@ if not es_portero:
             {stat_row("Goles - xG", sobr_txt)}
             {stat_row("% gol", def_txt)}
             {stat_row("Tiros", f"{tiros_tot:.0f}")}
-            {stat_row("Tiros al arco", f"{tiros_arco:.0f} ({pct_tiros_arco:.0f}%)")}
+            {stat_row("Tiros al arco", f"{tiros_arco:.0f} ({p['pct_tiros_arco']:.0f}%)")}
             {stat_row("Tiros fuera", f"{p['shotsOffTarget']:.0f}")}
             {stat_row("De penal", f"{p['penaltyGoals']:.0f}")}
             {stat_row("xG / tiro", xg_shot_txt)}
@@ -580,7 +579,9 @@ vista = vista.rename(columns={c: RENOMBRES.get(c, c) for c in vista.columns})
 
 config = {}
 for c in vista.columns:
-    if pd.api.types.is_numeric_dtype(vista[c]):
+    if c == "Jugador":
+        config[c] = st.column_config.TextColumn(label="Jugador", pinned=True)
+    elif pd.api.types.is_numeric_dtype(vista[c]):
         if pd.api.types.is_integer_dtype(vista[c]):
             config[c] = st.column_config.NumberColumn(format="%d")
         else:

@@ -15,7 +15,7 @@ LEAGUE = "Argentina Liga Profesional"
 OUT = "data/top_jugadores_liga.csv"
 METADATA = "data/ultima_actualizacion.txt"
 DETALLES_CSV = "data/player_details.csv"
-MIN_MINUTOS = 180
+MIN_MINUTOS = 300
 
 os.makedirs("data", exist_ok=True)
 
@@ -124,11 +124,13 @@ def actualizar() -> None:
 
     df.insert(5, "Edad", pd.to_numeric(
         ids.map(edades), errors="coerce").astype("Int64"))
-
+    
+    # Calculo goles/90 >> goles x 90 / minutos jugados
+    # ejemplo: Avalos >> 8 x 90 / 1350 = 0.53 goles / 90 minutos
     for c in PER90:
         if c in df.columns:
             df[f"{c}_per90"] = df[c].mul(90).div(df["minutesPlayed"])
-
+ 
     for col in df.select_dtypes(include="float").columns:
         df[col] = df[col].round(2)
 
