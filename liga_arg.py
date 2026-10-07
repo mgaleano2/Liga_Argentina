@@ -3,7 +3,13 @@ import sys
 from datetime import date
 import pandas as pd
 from ScraperFC.sofascore import Sofascore
-from ScraperFC.utils import botasaurus_browser_get_json, get_module_comps
+from ScraperFC.utils import botasaurus_browser_get_json_via_xhr, get_module_comps
+
+_SOFASCORE_HOME = "https://www.sofascore.com/"
+
+
+def sofa_get(url: str) -> dict:
+    return botasaurus_browser_get_json_via_xhr(url, _SOFASCORE_HOME)
 
 ##############################
 # Actualizado: 18-08-2026
@@ -85,7 +91,7 @@ def actualizar() -> None:
     comps = get_module_comps("SOFASCORE")
     league_id = comps[LEAGUE]["SOFASCORE"]
     season_id = s.get_valid_seasons(LEAGUE)[YEAR]
-    players = botasaurus_browser_get_json(
+    players = sofa_get(
         f"https://api.sofascore.com/api/v1/unique-tournament/{league_id}/season/{season_id}/players"
     )
     pos = {str(x["playerId"]): POS_ESP.get(x["position"]) for x in players["players"]}
@@ -94,7 +100,7 @@ def actualizar() -> None:
     edades = {}
     equipos = df["team id"].unique()
     for i, tid in enumerate(equipos, 1):
-        squad = botasaurus_browser_get_json(f"https://api.sofascore.com/api/v1/team/{tid}/players")
+        squad = sofa_get(f"https://api.sofascore.com/api/v1/team/{tid}/players")
         for x in squad["players"]:
             p = x["player"]
             edades[str(p["id"])] = edad_desde_ts(p.get("dateOfBirthTimestamp"))
@@ -109,7 +115,7 @@ def actualizar() -> None:
             edades[jid] = cache[jid]
         else:
             try:
-                p = botasaurus_browser_get_json(
+                p = sofa_get(
                     f"https://api.sofascore.com/api/v1/player/{jid}"
                 )["player"]
                 edad = edad_desde_ts(p.get("dateOfBirthTimestamp"))

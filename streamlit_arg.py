@@ -179,7 +179,6 @@ st.markdown("""
 # ============================================================
 # DATOS
 # ============================================================
-@st.cache_data
 def cargar():
     df = pd.read_csv("data/top_jugadores_liga.csv")
     df["player id"] = df["player id"].astype(str)
