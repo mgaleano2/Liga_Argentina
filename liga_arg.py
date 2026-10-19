@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from datetime import date
 import pandas as pd
 from ScraperFC.sofascore import Sofascore
@@ -7,9 +8,44 @@ from ScraperFC.utils import botasaurus_browser_get_json_via_xhr, get_module_comp
 
 _SOFASCORE_HOME = "https://www.sofascore.com/"
 
+# season_id conocido (evita 1 request a /seasons/, que es la que más bloquean).
+# Visto en sofascore_statistics_cache.json: liga 155, temporada 2026 -> 87913.
+SEASON_IDS = {"2026": 87913}
 
-def sofa_get(url: str) -> dict:
-    return botasaurus_browser_get_json_via_xhr(url, _SOFASCORE_HOME)
+_PAUSA_EQUIPOS_SEG = 3  # pausa entre requests para no disparar el rate-limit
+
+
+def _proxy_args() -> list[str] | None:
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+    if proxy:
+        return [f"--proxy-server={proxy}"]
+    return None
+
+
+def sofa_get(url: str, intentos: int = 3) -> dict:
+    ultimo: dict = {}
+    for i in range(1, intentos + 1):
+        r = botasaurus_browser_get_json_via_xhr(
+            url, _SOFASCORE_HOME, add_arguments=_proxy_args()
+        )
+        if isinstance(r, dict) and "error" in r and "players" not in r:
+            ultimo = r
+            print(f"  Sofascore {r.get('error')} en {url} (intento {i}/{intentos})")
+            time.sleep(5 * i)
+            continue
+        return r
+    raise RuntimeError(
+        f"SofaScore bloqueó la request (403 {ultimo.get('error')}). "
+        "IP marcada por el anti-bot: activá VPN/proxy residencial "
+        "(HTTPS_PROXY) y reintentá en unas horas. "
+        f"URL: {url}"
+    )
+
+
+def get_season_id(s: Sofascore, league: str, year: str) -> int:
+    if year in SEASON_IDS:
+        return SEASON_IDS[year]
+    return s.get_valid_seasons(league)[year]
 
 ##############################
 # Actualizado: 18-08-2026
@@ -90,7 +126,7 @@ def actualizar() -> None:
 
     comps = get_module_comps("SOFASCORE")
     league_id = comps[LEAGUE]["SOFASCORE"]
-    season_id = s.get_valid_seasons(LEAGUE)[YEAR]
+    season_id = get_season_id(s, LEAGUE, YEAR)
     players = sofa_get(
         f"https://api.sofascore.com/api/v1/unique-tournament/{league_id}/season/{season_id}/players"
     )
@@ -100,11 +136,18 @@ def actualizar() -> None:
     edades = {}
     equipos = df["team id"].unique()
     for i, tid in enumerate(equipos, 1):
-        squad = sofa_get(f"https://api.sofascore.com/api/v1/team/{tid}/players")
-        for x in squad["players"]:
+        try:
+            squad = sofa_get(f"https://api.sofascore.com/api/v1/team/{tid}/players")
+        except RuntimeError as e:
+            print(f"  (equipo {tid} bloqueado, se resuelve por jugador/caché: {e})")
+            print(f"edades: {i}/{len(equipos)}")
+            time.sleep(_PAUSA_EQUIPOS_SEG)
+            continue
+        for x in squad.get("players", []):
             p = x["player"]
             edades[str(p["id"])] = edad_desde_ts(p.get("dateOfBirthTimestamp"))
         print(f"edades: {i}/{len(equipos)}")
+        time.sleep(_PAUSA_EQUIPOS_SEG)
 
     cache = cargar_cache_edades()
     ids = df["player id"].astype(str)
