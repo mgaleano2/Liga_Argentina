@@ -12,7 +12,7 @@ id,nacimiento,edad,posicion,consultado
 1003907,1030492800,,Mediocampista,True
 1005177,918086400,,Mediocampista,True
 1009957,926640000,,Mediocampista,True
-1014804,989193600,,,True
+1014804,989193600,,Delantero,True
 1015281,965433600,,Mediocampista,True
 1015657,915235200,,Defensor,True
 1017278,1053475200,,Delantero,True
@@ -55,7 +55,7 @@ id,nacimiento,edad,posicion,consultado
 1066620,1077840000,,Mediocampista,True
 1067464,1046476800,,Delantero,True
 1067653,984009600,,Delantero,True
-1067805,954374400,,,True
+1067805,954374400,,Defensor,True
 1067815,965174400,,Mediocampista,True
 107397,707788800,,Delantero,True
 1083012,984528000,,Mediocampista,True
@@ -66,6 +66,7 @@ id,nacimiento,edad,posicion,consultado
 1085452,890870400,,Delantero,True
 1085834,1078444800,,Portero,True
 1085929,947721600,,Defensor,True
+1085930,1036627200,,Defensor,True
 1086285,1000425600,,,True
 1086339,1043193600,,Delantero,True
 1086924,1015200000,,Mediocampista,True
@@ -81,6 +82,7 @@ id,nacimiento,edad,posicion,consultado
 1086999,,25,Mediocampista,True
 1087004,893462400,,Defensor,True
 1087005,976665600,,Delantero,True
+1087009,1050364800,,Delantero,True
 1087017,943056000,,,True
 1087031,,25,,True
 1087034,967766400,,Defensor,True
@@ -88,7 +90,7 @@ id,nacimiento,edad,posicion,consultado
 1087070,991612800,,Delantero,True
 1087087,,25,Mediocampista,True
 1087089,971049600,,Mediocampista,True
-1087092,1072828800,,,True
+1087092,1072828800,,Mediocampista,True
 1087335,920073600,,Defensor,True
 1087512,1011744000,,,True
 1090319,1055376000,,Mediocampista,True
@@ -111,7 +113,7 @@ id,nacimiento,edad,posicion,consultado
 1096231,1076630400,,,True
 1096236,1052179200,,,True
 1096251,984873600,,Defensor,True
-1096363,830649600,,,True
+1096363,830649600,,Delantero,True
 1099481,824342400,,Portero,True
 1102817,1031270400,,Defensor,True
 1104322,998956800,,Delantero,True
@@ -189,7 +191,8 @@ id,nacimiento,edad,posicion,consultado
 1183059,,22,Defensor,True
 1183794,884563200,,Defensor,True
 1183795,898300800,,Mediocampista,True
-1185563,984960000,,,True
+1183942,951955200,,Mediocampista,True
+1185563,984960000,,Defensor,True
 1185702,1025222400,,Defensor,True
 1185969,1012262400,,Portero,True
 1186068,,24,Mediocampista,True
@@ -266,7 +269,7 @@ id,nacimiento,edad,posicion,consultado
 1467315,1052092800,,Mediocampista,True
 1468162,937440000,,Mediocampista,True
 146982,749088000,,Defensor,True
-1470460,1090713600,,,True
+1470460,1090713600,,Mediocampista,True
 1471214,1092009600,,Mediocampista,True
 1473035,1120608000,,Portero,True
 147351,651369600,,Portero,True
@@ -352,7 +355,7 @@ id,nacimiento,edad,posicion,consultado
 1644867,1174780800,,Mediocampista,True
 1649316,1088380800,,Mediocampista,True
 1649317,1054252800,23,Defensor,True
-1649897,1075161600,,,True
+1649897,1075161600,,Portero,True
 1650086,1199750400,,Mediocampista,True
 1650248,1047600000,,Defensor,True
 1650441,1032220800,,Defensor,True
@@ -418,8 +421,8 @@ id,nacimiento,edad,posicion,consultado
 1872418,1086480000,,,True
 1885940,1169164800,,Delantero,True
 1891111,1132617600,,Defensor,True
-1893227,1064793600,,,True
-1893228,1150761600,,,True
+1893227,1064793600,,Defensor,True
+1893228,1150761600,,Mediocampista,True
 1893248,1123200000,,Defensor,True
 1893304,1129075200,,Defensor,True
 1893308,1107043200,,Mediocampista,True
@@ -439,7 +442,7 @@ id,nacimiento,edad,posicion,consultado
 1997478,1118016000,,Defensor,True
 2016275,1110499200,,Mediocampista,True
 2017601,1105660800,,Mediocampista,True
-2017621,1119398400,,,True
+2017621,1119398400,,Mediocampista,True
 2017667,1161561600,,Mediocampista,True
 2031183,1122595200,,Defensor,True
 2031268,1177545600,,,True
@@ -455,7 +458,7 @@ id,nacimiento,edad,posicion,consultado
 2037740,1087948800,,Mediocampista,True
 2038763,1085788800,,Defensor,True
 2039907,,23,Defensor,True
-2041310,1132444800,,,True
+2041310,1132444800,,Mediocampista,True
 2048634,1183075200,,Defensor,True
 2049460,1183766400,,Mediocampista,True
 2050144,1104796800,,Portero,True
@@ -463,7 +466,7 @@ id,nacimiento,edad,posicion,consultado
 2050769,1170720000,,Delantero,True
 2050771,1178668800,,Mediocampista,True
 2054539,1169251200,,Mediocampista,True
-2073009,1137888000,,,True
+2073009,1137888000,,Delantero,True
 2073882,1089590400,,Defensor,True
 2076942,1139356800,20,Defensor,True
 2082102,1208995200,,Defensor,True
@@ -491,6 +494,7 @@ id,nacimiento,edad,posicion,consultado
 2119878,1106265600,,Defensor,True
 2123031,1026691200,,Delantero,True
 2124488,1110758400,,Defensor,True
+2138839,1138492800,,Delantero,True
 2150887,1136073600,,Delantero,True
 215246,604108800,,Mediocampista,True
 2158840,1203033600,,,True
@@ -524,16 +528,18 @@ id,nacimiento,edad,posicion,consultado
 2285317,1110931200,,,True
 2294279,1193616000,,Delantero,True
 22981,487987200,,Mediocampista,True
+2308497,1142640000,,Mediocampista,True
 2309788,1165363200,,Portero,True
-2309848,1122508800,,,True
+2309848,1122508800,,Defensor,True
 2317412,1158883200,,Delantero,True
-2322664,1156723200,,,True
+2322664,1156723200,,Delantero,True
 2338281,1083801600,,Portero,True
 2338324,1180569600,,Mediocampista,True
 2338435,1144713600,20,Mediocampista,True
 233856,753148800,,Defensor,True
 2353018,1173225600,19,Defensor,True
 2358308,1111104000,,Defensor,True
+2359012,1116115200,,Defensor,True
 239254,669427200,,Delantero,True
 2405408,1205798400,18,Delantero,True
 2411295,1249257600,,Mediocampista,True
@@ -608,7 +614,7 @@ id,nacimiento,edad,posicion,consultado
 2668144,1107561600,,Defensor,True
 2668145,1222992000,,Mediocampista,True
 2669120,1116460800,,,True
-2669156,1168646400,,,True
+2669156,1168646400,,Defensor,True
 2669157,1201910400,,Delantero,True
 2669306,1182470400,,,True
 2669385,1142553600,,Delantero,True
@@ -638,7 +644,7 @@ id,nacimiento,edad,posicion,consultado
 2808611,1239235200,,Mediocampista,True
 2810836,1230768000,,,True
 2818703,1157155200,,,True
-2818848,1157760000,,,True
+2818848,1157760000,,Mediocampista,True
 28381,519264000,,Portero,True
 2842299,1204588800,,,True
 285429,709430400,,Mediocampista,True
@@ -889,7 +895,7 @@ id,nacimiento,edad,posicion,consultado
 895720,821318400,,Delantero,True
 895734,919987200,,Portero,True
 895924,760665600,,Mediocampista,True
-895931,897350400,,,True
+895931,897350400,,Defensor,True
 896504,855446400,,,True
 896722,875577600,,Mediocampista,True
 896740,753321600,,,True
@@ -929,7 +935,7 @@ id,nacimiento,edad,posicion,consultado
 924198,987984000,,Delantero,True
 924518,915840000,,Delantero,True
 924526,758937600,,Defensor,True
-924907,745545600,,,True
+924907,745545600,,Portero,True
 926232,979689600,,,True
 926238,796435200,,Portero,True
 926413,,27,Mediocampista,True
@@ -1031,7 +1037,7 @@ id,nacimiento,edad,posicion,consultado
 988953,963014400,,Defensor,True
 989201,1009929600,,Defensor,True
 989206,945302400,,,True
-989208,920505600,,,True
+989208,920505600,,Defensor,True
 989717,921715200,,Defensor,True
 989796,988416000,,Mediocampista,True
 989849,,25,Delantero,True
